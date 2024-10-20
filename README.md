@@ -1,8 +1,8 @@
 Welcome! This small guide contains a lot of information and examples that will help you as you start learning Linux. 
-In addition to simple Linux commands, this file also provides three Python scripts that you can run and try out for yourself.
+In addition to simple Linux commands, this tutorial also provides three Python scripts, that you can run and try out the concepts in this tutorial yourself.
 
-# Unix Commands and Concepts
-If you are new to Unix or Linux systems, here is a brief explanation of a few key commands and concepts that are used when working with the command line:
+# Basic Unix Commands and Concepts
+If you are new to Unix or Linux systems, here is a brief explanation of a few key commands and concepts that are important when working with the command line:
 
 *cd (Change Directory):
 
@@ -11,13 +11,17 @@ For example, if you are in a directory called home, and you want to move to a di
 
 cd documents
 
-If you want to move to a higher-level directory (the parent directory), you can use:
+If you want to move to the parent directory, you can use:
 
 cd ..
 
 If you ever want to return to your home directory, simply type:
 
 cd
+
+Also you can combine some of them! If you want to move parent folder, then go another directory from there, you can simply write:
+
+cd ../directory_path
 
 *ls (List Directory Contents)
 

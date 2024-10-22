@@ -38,24 +38,34 @@ You can also add options to ls to view more details. For instance:
 
 *stdout (Standard Output)
 
-`stdout` stands for "standard output" and is where a program sends its regular output. 
-In most cases, this is your terminal screen. For example, when a command or program runs successfully, the result is displayed on `stdout`.
-You can redirect this output to a file if you don’t want it displayed on the screen. For example:
+`stdout` stands for "standard output", where a program sends its regular output. 
+In most cases, this is your terminal screen. For example, when a command or program runs successfully, the result is displayed on `stdout`, i.e. your terminal.
+You can redirect this output to a file if you don’t want it displayed on the screen. For example, if you have a program that simply writes out "Hello World!" to the terminal, you can redirect this output from the terminal to a file. When you achieve this, it still writes it out to the `stdout` but the directory of `stdout` would be changed. You can achieve this with the following command:
 
-[command] > output.txt
+python3 hello_world.py > output.txt
 
-This command takes what would normally appear on the screen and saves it to a file called `output.txt`.
+Let's break down this code together. First, we need to write python3 in unix-based systems to call python files successfully. Then, we need to say which file would be called. In this case, let's name our little program `hello_world.py`. When you give only these two as a command, it will normally write out `Hello World!` to the terminal. But instead, we are saying `> output.txt` to redirect the output into a file. You can redirect this output also to the `null container`. Null Container is a place that acting like a black hole. Redirected outputs will be gone forever. You can achieve this with:
 
+python3 hello_world.py > /dev/null
 
 *stdin (Standard Input)
 
 `stdin` stands for "standard input" and is where a program receives its input. By default, this is the keyboard, but it can also come from a file or the output of another command. 
 For example, if you run a command and are prompted to type something, that input is coming from `stdin`.
 
-You can also pipe the output of one command as the input (`stdin`) for another command like this:
+Imagine our `hello_world.py` also says our name! As the program can not know your name, "legally", you need to specify this. You can give your name like this:
 
-command1 | command2
-In this case, `command1`'s output becomes `command2`'s input.
+python3 hello_world.py ozgur
+
+Aaaaand it won't work. It is because normally, your python code can not understand if an `argument` exists in your command line. The library named `argparse` in python helps you to take inputs from the command line! When you set up argparse and modify your code correctly, it will take input from the command line and process it. 
+
+Now imagine you have two python codes. One of them picks a random name and the second one prints Hello World [name] with given input. You can run your first code, see what it outputs, and use the second code by writing the output of the first code. It won't bother you since you are taking only one name at a time, but imagine inputting 50 random names. To hindering this hard work, you can use `pipes!` Pipe is a kind of operator in unix-based systems, that helps you connect `stdout` and `stdin` of different codes. Also when you want to use the `pipe` operator, you do not need `argparse`. It takes the output of the first one and gives it to the second one.
+You can achieve this like this:
+
+python3 random_name_generator.py | python3 hello_world.py
+In this case, `random_name_generator.py`'s output becomes `hello_world.py`'s input.
+
+But wait! Yet it does not need to use argparse, you still have to take the output by using `sys.stdin.read()` to take input correctly. The exact usage of it may vary based on your code. 
 
 
 *stderr (Standard Error)

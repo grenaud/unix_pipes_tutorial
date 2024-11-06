@@ -1,42 +1,91 @@
 Welcome! This small guide contains a lot of information and examples that will help you as you start learning Linux. 
-In addition to simple Linux commands, this tutorial also provides three Python scripts, that you can run and try out the concepts in this tutorial yourself.
+In addition to simple Linux commands, this tutorial also provides three Python scripts, that you can run and try out the concepts yourself.
 
 # Basic Unix Commands and Concepts
-If you are new to Unix or Linux systems, here is a brief explanation of a few key commands and concepts that are important when working with the command line:
+This is where your journey begins! 
+If you are new to Unix-based systems and also got used to Windows or MacOS, you really need a brief explanation of a few key commands and concepts. Vice versa, you will have a heart attack every time while writing some code, thinking hopefully you did not delete some important thing (based on experiences).
 
-*cd (Change Directory):
+## cd (Change Directory):
 
-The cd command is used to navigate between directories (folders) in a Unix-based system. 
+The `cd` command is used to navigate between directories (folders) in a Unix-based system. 
 For example, if you are in a directory called home, and you want to move to a directory inside it called documents, you would type:
 
+```bash
 cd documents
+```
 
 If you want to move to the parent directory, you can use:
 
+```bash
 cd ..
+```
 
 If you ever want to return to your home directory, simply type:
 
+```bash
 cd
+```
 
-Also you can combine some of them! If you want to move parent folder, then go another directory from there, you can simply write:
+Also, you can combine some of them! If you want to move parent folder, and then go to another directory from there, you can simply write:
 
+```bash
 cd ../directory_path
+```
 
-*ls (List Directory Contents)
+## ls (List Directory Contents)
 
-The ls command lists the contents of the current directory you are in. It shows all files and subdirectories within that directory. 
+The `ls` command lists the contents of the current directory you are in. It shows all files and subdirectories within that directory. 
 For example, to see what files and directories are inside the current folder, type:
 
+```bash
 ls
+```
 
 You can also add options to ls to view more details. For instance:
 
-- ls -l lists files with detailed information, such as file permissions, size, and modification dates.
-- ls -a lists all files, including hidden ones (files that start with a dot .).
+- `ls -l` lists files with detailed information, such as file permissions, size, and modification dates.
+- `ls -a` lists all files, including hidden ones (files that start with a dot .).
 
+## mkdir (Creating Directories)
 
-*stdout (Standard Output)
+The `mkdir (make directory)` command is used to create new directories (folders) within the Unix file system. Organizing files into directories helps maintain a structured and manageable file system., which is a good thing.
+You can simply create directories from `your current directory` using `mkdir` like this:
+
+```bash
+mkdir 'directory_path'
+```
+For example if you are in a directory named `my_directory` and want to create directory named `my_new_directory`, you will write:
+
+```bash
+mkdir my_new_directory
+```
+It will be created without notifying you. But you can check if the directory created by using `ls`. The output of this command should be seen like this:
+
+```
+_other folders or files_
+my_new_directory
+```
+
+Checking it by yourself is not bad, but it would be better if it notifies you when the directory is created. For that, you can use the flag `-v`! The 'v' here means `verbose` and notifies you when the directory is created successfully, or vice versa. How it notifies? Outputting the success message to your terminal, since the terminal is where the standard output goes. What is standard output? We will talk about it later!
+
+```bash
+mkdir -v my_new_directory
+```
+This code now prints out the message that you created successfully the directory.
+
+Now imagine you need to create a folder, in a folder, which is in a folder. Creating all of them would not be that hard, but what if you need to create 20 folders like that? Instead of exhaustively doing that, you can use another flag, `-p`! `-p` flag will create parent directories as well, `__if they are not existing__`. You can achieve this like this:
+
+```bash
+mkdir -p my_new_directory/my_another_new_directory/unix_tutorial
+```
+
+This code will create all directories if they do not exist. Also, you can combine the flags `-v` and `-p` to get notified at every creating step. 
+
+You can ask yourself why are we splitting all directories with `/` but not using it before the first directory? Normally you can use it, but having `/` at the very first position tells your system that you are trying to do something from the `root` directory. So if you add `/` before the `my_new_directory`, your system will create all folders not from your current location, but from the root directory. Yet you can use this if you want to create a directory rooting from different locations.
+
+# stdout, stdin and stderr
+
+## stdout (Standard Output)
 
 `stdout` stands for "standard output", where a program sends its regular output. 
 In most cases, this is your terminal screen. For example, when a command or program runs successfully, the result is displayed on `stdout`, i.e. your terminal.
@@ -48,7 +97,7 @@ Let's break down this code together. First, we need to write python3 in unix-bas
 
 python3 hello_world.py > /dev/null
 
-*stdin (Standard Input)
+## stdin (Standard Input)
 
 `stdin` stands for "standard input" and is where a program receives its input. By default, this is the keyboard, but it can also come from a file or the output of another command. 
 For example, if you run a command and are prompted to type something, that input is coming from `stdin`.
@@ -68,7 +117,7 @@ In this case, `random_name_generator.py`'s output becomes `hello_world.py`'s inp
 But wait! Yet it does not need to use argparse, you still have to take the output by using `sys.stdin.read()` to take input correctly. The exact usage of it may vary based on your code. 
 
 
-*stderr (Standard Error)
+## stderr (Standard Error)
 
 `stderr` stands for "standard error" and is used by programs to send error messages or diagnostics. 
 This is also shown on your terminal screen by default, but it is separate from `stdout`. 
@@ -80,11 +129,11 @@ command 2> error_log.txt
 This command saves any error messages to `error_log.txt` while still displaying the normal output on the screen or wherever `stdout` is directed.
 
 
-*stdout, stdin, and stderr in Python
+# stdout, stdin, and stderr in Python
 
 In Python, `stdout`, `stdin`, and `stderr` can also be accessed and manipulated programmatically. Here's how they are used:
 
-*stdout in Python
+## stdout in Python
 
 In Python, `stdout` is accessed using the `sys.stdout` object. When you print something, it is sent to `stdout`. You can manually write to `stdout` as follows:
 
@@ -103,7 +152,7 @@ with open('output.txt', 'w') as f:
 ```
 
 
-*stdin in Python
+## stdin in Python
 
 Python can read from `stdin` using the `input()` function or directly from `sys.stdin`. Here's an example:
 
@@ -128,8 +177,7 @@ with open('input.txt', 'r') as f:
         print(f"Reading from file: {line.strip()}")
 ```
 
-
-*stderr in Python
+## stderr in Python
 
 Errors in Python can be printed to `stderr` instead of `stdout`, which is useful for separating normal output from error messages. Here's how to write to `stderr`:
 
@@ -148,7 +196,7 @@ with open('error_log.txt', 'w') as f:
 ```
 
 
-**Summary
+## Summary
 
 - `stdout` in Python is used for regular output and can be redirected to files.
 - `stdin` is used to get input from the user or other sources, and it can be redirected to read from files.

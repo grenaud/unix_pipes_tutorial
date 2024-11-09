@@ -26,7 +26,7 @@ If you ever want to return to your home directory, simply type:
 cd
 ```
 
-Also, you can combine some of them! If you want to move parent folder, and then go to another directory from there, you can simply write:
+Also, you can combine some of them! If you want to move to the parent folder, and then go to another directory from there, you can simply write:
 
 ```bash
 cd ../directory_path
@@ -48,13 +48,13 @@ You can also add options to ls to view more details. For instance:
 
 ## mkdir (Creating Directories)
 
-The `mkdir (make directory)` command is used to create new directories (folders) within the Unix file system. Organizing files into directories helps maintain a structured and manageable file system., which is a good thing.
+The `mkdir (make directory)` command is used for creating new directories (folders) within the Unix file system. Organizing files into directories helps maintain a structured and manageable file system., which is a good thing.
 You can simply create directories from `your current directory` using `mkdir` like this:
 
 ```bash
 mkdir 'directory_path'
 ```
-For example if you are in a directory named `my_directory` and want to create directory named `my_new_directory`, you will write:
+For example, if you are in a directory named `my_directory` and want to create a directory named `my_new_directory`, you will write:
 
 ```bash
 mkdir my_new_directory
@@ -82,6 +82,23 @@ mkdir -p my_new_directory/my_another_new_directory/unix_tutorial
 This code will create all directories if they do not exist. Also, you can combine the flags `-v` and `-p` to get notified at every creating step. 
 
 You can ask yourself why are we splitting all directories with `/` but not using it before the first directory? Normally you can use it, but having `/` at the very first position tells your system that you are trying to do something from the `root` directory. So if you add `/` before the `my_new_directory`, your system will create all folders not from your current location, but from the root directory. Yet you can use this if you want to create a directory rooting from different locations.
+
+## htop
+
+`htop` is an interactive and user-friendly process viewer for Unix systems. It provides a real-time, color-coded display of system processes, CPU usage, memory consumption, and more. If you are used to using Windows systems, `htop` is kinda similar to `Task Manager`.
+You can open up `htop` by simply writing:
+
+```bash
+htop
+```
+By writing that, you should get a tab like following:
+![htop](https://github.com/user-attachments/assets/0ca69cd7-05e0-40d7-ba0f-8f539fda5b91)
+
+The best thing (for me) `htop` providing is the `with mouse navigating`. You can click the buttons on green line and access CPU-Usage, Memory-Usage and so on.
+
+## nano
+
+`nano` is a simple, user-friendly text editor for Unix-like systems. It is ideal for beginners and those who prefer straightforward editing without the complexity of more advanced editors like `vim` or `emacs`. nano operates entirely within the terminal, allowing quick editing of configuration files, scripts, and other text documents. 
 
 # stdout, stdin and stderr
 

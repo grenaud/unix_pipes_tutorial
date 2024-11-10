@@ -59,14 +59,14 @@ For example, if you are in a directory named `my_directory` and want to create a
 ```bash
 mkdir my_new_directory
 ```
-It will be created without notifying you. But you can check if the directory created by using `ls`. The output of this command should be seen like this:
+It will be created without notifying you. But you can check if the directory was created by using `ls`. The output of this command should be seen like this:
 
 ```
-_other folders or files_
+*other folders or files
 my_new_directory
 ```
 
-Checking it by yourself is not bad, but it would be better if it notifies you when the directory is created. For that, you can use the flag `-v`! The 'v' here means `verbose` and notifies you when the directory is created successfully, or vice versa. How it notifies? Outputting the success message to your terminal, since the terminal is where the standard output goes. What is standard output? We will talk about it later!
+Checking it yourself is not bad, but it would be better if it would notify you when the directory is created. For that, you can use the flag `-v`! The 'v' here means `verbose` and notifies you when the directory is created successfully, or vice versa. How does it notify? Outputting the success message to your terminal, since the terminal is where the standard output goes. What is standard output? We will talk about it later!
 
 ```bash
 mkdir -v my_new_directory
@@ -81,7 +81,7 @@ mkdir -p my_new_directory/my_another_new_directory/unix_tutorial
 
 This code will create all directories if they do not exist. Also, you can combine the flags `-v` and `-p` to get notified at every creating step. 
 
-You can ask yourself why are we splitting all directories with `/` but not using it before the first directory? Normally you can use it, but having `/` at the very first position tells your system that you are trying to do something from the `root` directory. So if you add `/` before the `my_new_directory`, your system will create all folders not from your current location, but from the root directory. Yet you can use this if you want to create a directory rooting from different locations.
+You can ask yourself, why are we splitting all directories with `/` but not using it before the first directory? Normally you can use it, but having `/` at the very first position tells your system that you are trying to do something from the `root` directory. So if you add `/` before the `my_new_directory`, your system will create all folders not from your current location, but from the root directory. Yet you can use this if you want to create a directory rooting from different locations.
 
 ## htop
 
@@ -91,14 +91,11 @@ You can open up `htop` by simply writing:
 ```bash
 htop
 ```
-By writing that, you should get a tab like following:
+By writing that, you should get a tab like the following:
+
 ![htop](https://github.com/user-attachments/assets/0ca69cd7-05e0-40d7-ba0f-8f539fda5b91)
 
 The best thing (for me) `htop` providing is the `with mouse navigating`. You can click the buttons on green line and access CPU-Usage, Memory-Usage and so on.
-
-## nano
-
-`nano` is a simple, user-friendly text editor for Unix-like systems. It is ideal for beginners and those who prefer straightforward editing without the complexity of more advanced editors like `vim` or `emacs`. nano operates entirely within the terminal, allowing quick editing of configuration files, scripts, and other text documents. 
 
 # stdout, stdin and stderr
 
@@ -106,13 +103,44 @@ The best thing (for me) `htop` providing is the `with mouse navigating`. You can
 
 `stdout` stands for "standard output", where a program sends its regular output. 
 In most cases, this is your terminal screen. For example, when a command or program runs successfully, the result is displayed on `stdout`, i.e. your terminal.
-You can redirect this output to a file if you don’t want it displayed on the screen. For example, if you have a program that simply writes out "Hello World!" to the terminal, you can redirect this output from the terminal to a file. When you achieve this, it still writes it out to the `stdout` but the directory of `stdout` would be changed. You can achieve this with the following command:
+You can redirect this output to a file if you don’t want it displayed on the screen. 
 
-python3 hello_world.py > output.txt
+Lets say, you have a program, `hello_world.py`, that simply writes out "Hello World!" to the terminal, looking like this:
 
-Let's break down this code together. First, we need to write python3 in unix-based systems to call python files successfully. Then, we need to say which file would be called. In this case, let's name our little program `hello_world.py`. When you give only these two as a command, it will normally write out `Hello World!` to the terminal. But instead, we are saying `> output.txt` to redirect the output into a file. You can redirect this output also to the `null container`. Null Container is a place that acting like a black hole. Redirected outputs will be gone forever. You can achieve this with:
+```python
+print("Hello World!")
+```
 
+When you run this command in Linux by writing `python3 hello_world.py` you will see the output `Hello World!` in your terminal. 
+
+Let's break down this code together. First, we need to write `python3` in unix-based systems to call python files successfully. Then, we need to say which file would be called. In this case, the name of our little program is `hello_world.py`. When you give only these two as a command, it will normally write out `Hello World!` to the terminal.
+
+Cool, right? But what if you want to print out this output to a text file named `greeting.txt`? The first way to achieve this, you could change the program itself like this:
+
+```python
+import sys
+
+# Redirect stdout to a file
+with open("greeting.txt", "w") as file:
+    sys.stdout = file
+    print("Hello World!")
+```
+
+And then, `python3 hello_world.py` would create `greeting.txt`, and append `Hello World!` in it. When you achieve this, it still writes it out to the `stdout` but the directory of `stdout` would be changed. Yet it works for us, it kinda seems a bit exhaustive. 
+
+The second way, and a bit easier way is using directly `file descriptors` of Linux. Using file descriptors is a way to manipulate the outputs, errors, and inputs of programs. Using the very first version of `hello_world.py` and file descriptors, you can achieve it like:
+
+```bash
+python3 hello_world.py > greeting.txt
+```
+
+The `>` operator here, is one of the basic `file descriptors` in Linux. Using it like that, you will redirect the `output` of the program into a file. In detail, we will talk about it in next chapters.
+
+There may also be a situation where you want to delete the output of the program. You can do this again using file descriptors. The directory named ‘/dev/null’ is a special directory and acts like a black hole, so to speak. Everything you send there will be lost. Suppose we don't want to see the output of `hello_world.py`. We can achieve this as follows: 
+
+```python
 python3 hello_world.py > /dev/null
+```
 
 ## stdin (Standard Input)
 
@@ -121,11 +149,74 @@ For example, if you run a command and are prompted to type something, that input
 
 Imagine our `hello_world.py` also says our name! As the program can not know your name, "legally", you need to specify this. You can give your name like this:
 
+```bash
 python3 hello_world.py ozgur
+```
 
-Aaaaand it won't work. It is because normally, your python code can not understand if an `argument` exists in your command line. The library named `argparse` in python helps you to take inputs from the command line! When you set up argparse and modify your code correctly, it will take input from the command line and process it. 
+Aaaaand it won't work. It is because normally, your python code can not understand if an `argument` exists in your command line. The library named `argparse` in python helps you to take inputs better from the command line! When you set up argparse and modify your code correctly, it will take input from the command line and process it.
 
-Now imagine you have two python codes. One of them picks a random name and the second one prints Hello World [name] with given input. You can run your first code, see what it outputs, and use the second code by writing the output of the first code. It won't bother you since you are taking only one name at a time, but imagine inputting 50 random names. To hindering this hard work, you can use `pipes!` Pipe is a kind of operator in unix-based systems, that helps you connect `stdout` and `stdin` of different codes. Also when you want to use the `pipe` operator, you do not need `argparse`. It takes the output of the first one and gives it to the second one.
+We can modify our little code like this:
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description="Greeting Message")
+    parser.add_argument('name', nargs='?', help='Your name to greet correctly')
+    args = parser.parse_args()
+
+    print(f"Hello World! {args.name}")
+
+if __name__ == "__main__":
+    main()
+```
+
+Well, that's a huge modification at all. 
+
+Here what we call 'parser' is our python class. We add an argument to this class and name it 'name'. Then we use parser.parse_args() to get the arguments correctly. This will allow us to keep each argument by flags. So when you type your name in the argument point flagged 'name', you can call it as name.`yourname`. Now, if you call the code like:
+
+```bash
+python3 hello_world.py ozgur
+```
+
+You will get:
+
+```
+Hello World! ozgur
+```
+
+Even if it doesn't make sense, we were able to get our output right, that's something.
+
+Now imagine you have two python codes. One of them picks a random name and the second one prints Hello World [name] with the chosen name. You can run your first code, see what it outputs, and use the second code by writing the output of the first code. It won't bother you since you are taking only one name at a time, but imagine inputting 50 random names. To hinder this hard work, you can use `pipes!` Pipe is a kind of operator in unix-based systems, that helps you connect `stdout` and `stdin` of different codes. Also when you want to use the `pipe` operator, you do not need `argparse`. By using file descriptors, or pipes, you change the type of the input into a file, so you need to process it like a file.
+
+Let's name our first code `random_name_generator.py`:
+
+```python
+import random
+
+danish_names = [
+    "Anders", "Niels", "Jens", "Poul", "Lars", "Morten", "Søren", "Thomas", "Peter", "Martin",
+    "Henrik", "Jesper", "Frederik", "Kasper", "Rasmus", "Svend", "Jacob", "Simon", "Mikkel", "Christian",
+    "Brian", "Steffen", "Jonas", "Mark", "Daniel", "Carsten", "Torben", "Bent", "Erik", "Michael",
+    "Viggo", "Oskar", "Emil", "Victor", "Alexander", "Sebastian", "Oliver", "William", "Noah", "Lasse",
+    "Mads", "Bjørn", "Leif", "Gunnar", "Elias", "August", "Aksel", "Finn", "Ebbe", "Vladimir",
+    "Anne", "Karen", "Pia", "Mette", "Lise", "Hanne", "Rikke", "Sofie", "Camilla", "Maria",
+    "Julie", "Christine", "Birthe", "Tine", "Kirsten", "Ingrid", "Line", "Trine", "Kristine", "Mia",
+    "Cecilie", "Charlotte", "Emma", "Ida", "Nadia", "Sanne", "Sara", "Eva", "Helene", "Nanna",
+    "Maja", "Lærke", "Molly", "Stine", "Emilie", "Amalie", "Signe", "Freja", "Isabella", "Tuva",
+    "Viktoria", "Ane", "Dorte", "Laura", "Asta", "Marie", "Clara", "Sofia", "Filippa", "Ella",
+    "Alex", "Robin", "Kim", "Sam", "Alexis", "Charlie", "Taylor", "Jamie", "Morgan", "Riley"
+]
+
+# Select 10 random names without replacement
+random_names = random.sample(danish_names, 10)
+
+# Print each name on a separate line
+for name in random_names:
+    print(name)
+```
+
+
 You can achieve this like this:
 
 python3 random_name_generator.py | python3 hello_world.py

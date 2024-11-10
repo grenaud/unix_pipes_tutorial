@@ -187,14 +187,14 @@ Hello World! ozgur
 
 Even if it doesn't make sense, we were able to get our output right, that's something.
 
-Now imagine you have two python codes. One of them picks a random name and the second one prints Hello World [name] with the chosen name. You can run your first code, see what it outputs, and use the second code by writing the output of the first code. It won't bother you since you are taking only one name at a time, but imagine inputting 50 random names. To hinder this hard work, you can use `pipes!` Pipe is a kind of operator in unix-based systems, that helps you connect `stdout` and `stdin` of different codes. Also when you want to use the `pipe` operator, you do not need `argparse`. By using file descriptors, or pipes, you change the type of the input into a file, so you need to process it like a file.
+Now imagine you have two python codes. One of them picks a random name and the second one prints Hello World [name] with the chosen name (our little programme). You can run your first code, see what it outputs, and use the second code by writing the output of the first code. It won't bother you since you are taking only one name at a time, but imagine inputting 50 random names. To hinder this hard work, you can use `pipes!` Pipe is a kind of operator in unix-based systems, that helps you connect `stdout` and `stdin` of different codes. Also when you want to use the `pipe` operator, you do not need `argparse`. By using file descriptors, or pipes, you change the type of the input into a file, so you need to process it like a file.
 
 Let's name our first code `random_name_generator.py`:
 
 ```python
 import random
 
-danish_names = [
+names = [
     "Anders", "Niels", "Jens", "Poul", "Lars", "Morten", "Søren", "Thomas", "Peter", "Martin",
     "Henrik", "Jesper", "Frederik", "Kasper", "Rasmus", "Svend", "Jacob", "Simon", "Mikkel", "Christian",
     "Brian", "Steffen", "Jonas", "Mark", "Daniel", "Carsten", "Torben", "Bent", "Erik", "Michael",
@@ -216,20 +216,89 @@ for name in random_names:
     print(name)
 ```
 
+And after a little adjustments, our `hello_world.py`:
+```python
+import sys
 
-You can achieve this like this:
+def main():
+    # Reading names
+    for line in sys.stdin:
+        name = line.strip()  # Stripping lines
+        if name:  # For every name
+            print(f"Hello World! {name}")
 
+if __name__ == "__main__":
+    main()
+```
+
+You can achieve the given task using pipes like this:
+
+```bash
 python3 random_name_generator.py | python3 hello_world.py
-In this case, `random_name_generator.py`'s output becomes `hello_world.py`'s input.
+```
 
-But wait! Yet it does not need to use argparse, you still have to take the output by using `sys.stdin.read()` to take input correctly. The exact usage of it may vary based on your code. 
+or with file descriptors:
 
+```bash
+python3 random_name_generator.py > names.txt
+python3 hello_world.py < names.txt
+```
+
+Both work perfectly, but notice how easier to use `pipes` for this type of task, compared to file descriptors.
 
 ## stderr (Standard Error)
 
 `stderr` stands for "standard error" and is used by programs to send error messages or diagnostics. 
-This is also shown on your terminal screen by default, but it is separate from `stdout`. 
-This distinction allows you to handle errors separately if needed.
+This is also shown on your terminal screen by default, but it is separate from `stdout`. Reading both of them on your terminal would be hard to distinguish them, so redirecting one of them would be better in general.
+
+Let's say we want to print a status message for the `hello_world.py`. After every line is written out as stdout, it should provide the status message, `Name greeted: name`. We can directly print it out with print function like this:
+
+```python
+import sys
+
+def main():
+    # Reading names
+    for line in sys.stdin:
+        name = line.strip()  # Stripping
+        if name:
+            print(f"Hello World! {name}")
+            print(f"Name greeted: {name}")
+
+if __name__ == "__main__":
+    main()
+```
+
+When you run this code, it will output something like that:
+
+```
+Hello World! Maria
+Name greeted: Maria
+Hello World: Anders
+Name greeted: Anders
+...
+```
+
+It works, but it is not something we want to achieve. First, the `status message` is still going to `stdout`. 
+
+If you change the stdout location using the file descriptor, all messages will still go to the same place. So first we need to define the status message as `stderr` and then change the `output location of stderr`.
+
+We can achieve the defining `stderr` like this:
+
+```python
+import sys
+
+def main():
+    for line in sys.stdin:
+        name = line.strip()
+        if name:
+            print(f"Hello World! {name}")
+            print(f"Name greeted: {name}", file=sys.stderr)
+
+if __name__ == "__main__":
+    main()
+```
+`file` is a argument of `print` function of python, which 
+
 
 For example, you can redirect errors to a file without affecting the regular output:
 command 2> error_log.txt

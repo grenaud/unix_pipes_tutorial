@@ -329,66 +329,73 @@ Welcome! This part of the tutorial provides a real-world example where you can u
 
 This script is designed to generate random integers within a specified interval. It is intended for use as an internship task, providing a simple way to produce a list of random numbers.
 The script can be executed from the command line with optional arguments to specify the number of integers to generate and the range of values.
-It returns none since the generated numbers are written directly to the stdout.
+It returns none since the generated numbers are written directly to the `stdout`.
 
 Ensure that the `min` value is less than or equal to the `max` value to avoid errors.
-The script writes the output directly to the standard output, which can be redirected to a file if needed.
 
-Arguments are:
+Arguments (or flags) are:
 - `n` (positional, optional): The number of random integers to generate. Defaults to 100 if not specified.
 - `--min` (optional): The minimum value of the interval. Defaults to 10.
 - `--max` (optional): The maximum value of the interval. Defaults to 100.
 
 To generate 50 random integers between 1 and 50, you would run:
-python random_int_generator.py 50 --min 1 --max 50
 
+```bash
+python3 random_int_generator.py 50 --min 1 --max 50
+```
 
-# Prime Checker (5 different)
+Since this code prints out all the numbers as we did in `random_name_generator`, we will process it as we did in `hello_world.py`. 
 
-The prime checker scripts are designed to determine if numbers provided via standard input are prime. 
-It outputs the prime numbers to standard output and logs the runtime of the operation to a file named runtime_[x].txt, where X is the prime checker algorithm.
-To use this script, you need to provide a list of numbers through standard input. The script will then check each number to determine if it is prime and output the prime numbers.
-It returns True if the provided number is prime, and False otherwise.
+This code also provides the `runtime`. By measuring the runtime, you can evaluate how quickly the program generates the desired number of random integers within the specified interval. This information is crucial for optimizing the code, especially when scaling up to generate larger datasets or integrating the generator into larger applications where performance may impact overall system efficiency. And while this process ongoing, you can check memory or CPU usage by using `htop`, as we talked about in the previous section.
 
-The script can also be used in conjunction with a random integer generator. For example, you can generate random numbers and pipe them directly into the script:
-python random_integer_generator.py X --min Y --max Z | python prime_checker.py
+# Prime Checkers (Naive and 4 Others)
 
-In this setup, random_integer_generator.py is a script that outputs random integers to standard output, which are then piped into prime_checker.py for prime checking.
+The prime checker scripts are designed to determine if numbers provided via standard input (`stdin`) are prime. 
+It outputs the prime numbers to standard output and logs the runtime of the operation to a file named `runtime_[x].txt`, where `x` is the name of the prime checker algorithm.
+To use this scripts, you need to provide a list of numbers through standard input. The script will then check each number to determine if it is prime and output the prime numbers.
+It returns prime numbers line by line.
 
-**The pipe (|) is a shell function that takes the output of one command and uses it as the input for another command. 
-**In the context of this script, it allows the output of a random integer generator to be directly fed into the prime_checker.py script without the need for intermediate files.
+Let's start talking about the `trivial` one. The `trivial` one, which can be found in this repository as (`prime_checker.py`), is a function that efficiently determines whether a given number `num` is prime. It first excludes numbers less than or equal to 1 and directly identifies 2 and 3 as prime. It then eliminates any even numbers and multiples of 3 to reduce unnecessary checks. For numbers greater than 3, the function iterates from 5 up to the square root of num, checking divisibility in steps of 6. This approach leverages the fact that all primes greater than 3 are of the form `6k ± 1`, thereby minimizing the number of iterations and enhancing performance compared to the naive method of checking all numbers up to `num - 1`. If no divisors are found, the function concludes that num is prime.
 
-5 different prime checking algorithm provided in this code bundle. These are:
-- AKS Primality
-- Sieve of Atkin
-- Sieve of Eratosthenes
-- Trivial Prime Checker
-- Miller - Rabin Primality 
+Since this script needs a list of integers, you can take these integers from `random_int_generator.py`! Instead of exhaustively having these numbers and feeding them into `prime_checker.py` separately, let's use the brand new thing we learned, `pipes`!
 
-The script currently does not utilize command-line arguments, despite setting up an argparse parser.
-The itertools module is imported but not used, which could be removed to clean up the code.
+You can pipe both scripts like this:
+```bash
+python3 random_integer_generator.py | python prime_checker.py
+```
+
+As we specified earlier, the random integer generator generates 100 numbers between 10 and 100, so our prime checker would be fed with them. It will then print out only `prime ones`. That means, the original output of `random_int_generator.py` would be omitted since it has been redirected to the `prime_checker.py`. Also this prime checker code provides the runtime to the user, for assessing the performance of this code.
+
+There are 4 different prime checker algorithms provided in this repository, all could be called with the same command by changing the name of the `python file`. 
+These are:
+- AKS Primality (`prime_aks.py`)
+- Sieve of Atkin (`prime_atkin.py`)
+- Sieve of Eratosthenes (`prime_ars.py`)
+- Miller - Rabin Primality (`prime_miller-rabin.py`)
+
+These are all providing `runtime`, so check yourself which one runs faster when it comes to checking the high volume of random integers.
 
 # RSA Checker
 
 The RSAchecker.py script is designed to verify the validity of RSA key pairs generated from two lists of prime numbers. 
-It reads prime numbers from two files, computes the RSA key pair for each pair of primes, and checks if the encryption and decryption process is successful.
+It reads prime numbers from two files, computes the RSA key pair for each pair of primes, and checks if the encryption and decryption process is successful. If you want to learn about it further, you can find information about RSA encryption further on the internet.
 
-To use this script, you need to provide two files containing prime numbers. Each file should have one prime number per line. The script will read these files, compute RSA key pairs, and verify their validity.
+To use this script, you need to provide two files containing prime numbers, one is so-called `public keys`, and the other one is `private keys`. Each file should have one prime number per line. The script will read these files, compute RSA key pairs, and verify their validity.
+
 The correct way to use this script follows:
 python RSAchecker.py [file_with_primes_1] [file_with_primes_2]
 
-The script can also be used with process substitution to handle input from other scripts or commands, allowing for dynamic generation and checking of RSA key pairs. As follows:
-python3 RSAchecker.py <(command1) <(command2)
+But since we do not have the prime numbers in files, we need to utilize `file descriptors`! A way to use two file descriptors at the same time is by bundling commands together with parenthesis. It will bundle the codes together and redirects the output of all code inside the parentheses. A little confusing, right? Let's break it down, using an example:
 
-Where command1 and command2 seems like:
-python random_integer_generator.py X --min Y --max Z | python prime_checker.py
+```bash
+python3 RSAchecker.py <(python random_integer_generator.py | python prime_checker.py) <(python random_integer_generator.py | python prime_checker.py)
+```
+We knew the part inside the parentheses, it outputs a list of prime numbers. Now, we do it two times since we need a pair of prime numbers. We bundled the parts that output prime numbers and redirected them to the `RSAchecker.py`. `<` indicates that the input goes into the file, so that is the reverse of what we did in the previous section. 
 
-So:
-python3 RSAchecker.py <(python random_integer_generator.py X --min Y --max Z | python prime_checker.py) <(python random_integer_generator.py X --min Y --max Z | python prime_checker.py)
+And voila! It worked perfectly, and we have valid prime number pairs for encryption. 
 
-**Process substitution allows the output of a command to be used as a file input to another command. 
-**The syntax <(command) creates a temporary file descriptor that can be read by the script as if it were a regular file. 
-**This is particularly useful for chaining commands together without creating intermediate files.
+Congrats! Your encryption works!
 
-The script assumes that the input files contain valid prime numbers and does not perform primality testing.
-The common public exponent used is 65537, which is a commonly used value in RSA cryptography.
+## Thanks for the attention! See you in another tutorial!
+Written by Özgür Yolcu
+Instructed by Gabriel Renaud

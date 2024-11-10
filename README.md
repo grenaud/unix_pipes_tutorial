@@ -297,90 +297,29 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-`file` is a argument of `print` function of python, which 
+`file` is an argument of `print` function in python, which specifies where the output goes. If you give a specific text file to that argument, it prints out there. The default value of it is `sys.stdout`, so basically `stdout`. You can change it by specifying that argument as `file=sys.stderr`. 
 
+Now we want to redirect this status message into a file named `status.txt`. As we do it before, we can use `file descriptors`! Let's try it like this:
 
-For example, you can redirect errors to a file without affecting the regular output:
-command 2> error_log.txt
-
-This command saves any error messages to `error_log.txt` while still displaying the normal output on the screen or wherever `stdout` is directed.
-
-
-# stdout, stdin, and stderr in Python
-
-In Python, `stdout`, `stdin`, and `stderr` can also be accessed and manipulated programmatically. Here's how they are used:
-
-## stdout in Python
-
-In Python, `stdout` is accessed using the `sys.stdout` object. When you print something, it is sent to `stdout`. You can manually write to `stdout` as follows:
-
-```python
-import sys
-sys.stdout.write("This is a message to stdout\n")
+```bash
+python3 hello_world.py > status.txt
 ```
 
-You can also redirect `stdout` to a file:
+Did not work right? That's because the `>` operator redirects only `stdout`. If we want to redirect `stderr`, we specify this with `2>`! But why, we did not use some number for redirecting `stdout`? All `stdout, stderr, and stdin` have values for specifying.
 
-```python
-import sys
-with open('output.txt', 'w') as f:
-    sys.stdout = f
-    print("This will go to the file instead of the screen")
+- Standard Input (stdin): File descriptor 0
+- Standard Output (stdout): File descriptor 1
+- Standard Error (stderr): File descriptor 2
+
+But the default one is `stdout`, so you do not need to define it explicitly. 
+
+Based on this information, we can redirect our status message into `status.txt` with following command:
+
+```bash
+python3 hello_world.py 2> status.txt 
 ```
 
-
-## stdin in Python
-
-Python can read from `stdin` using the `input()` function or directly from `sys.stdin`. Here's an example:
-
-```python
-# Using input
-user_input = input("Enter something: ")
-print(f"You entered: {user_input}")
-
-# Reading directly from sys.stdin
-import sys
-for line in sys.stdin:
-    print(f"Received from stdin: {line.strip()}")
-```
-
-You can also redirect `stdin` to read from a file:
-
-```python
-import sys
-with open('input.txt', 'r') as f:
-    sys.stdin = f
-    for line in sys.stdin:
-        print(f"Reading from file: {line.strip()}")
-```
-
-## stderr in Python
-
-Errors in Python can be printed to `stderr` instead of `stdout`, which is useful for separating normal output from error messages. Here's how to write to `stderr`:
-
-```python
-import sys
-sys.stderr.write("This is an error message\n")
-```
-
-You can also redirect `stderr` to a file:
-
-```python
-import sys
-with open('error_log.txt', 'w') as f:
-    sys.stderr = f
-    sys.stderr.write("This error message will be written to the file\n")
-```
-
-
-## Summary
-
-- `stdout` in Python is used for regular output and can be redirected to files.
-- `stdin` is used to get input from the user or other sources, and it can be redirected to read from files.
-- `stderr` is used for error messages and can be redirected to log files for error tracking.
-
-These streams are part of the `sys` module and can be controlled or redirected within your Python programs.
-
+That's the end of this chapter. Next on, we will talk about a real-world implementation of all concepts above.
 
 
 # Random Integer Generator

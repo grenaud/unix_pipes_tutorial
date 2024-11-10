@@ -398,4 +398,5 @@ Congrats! Your encryption works!
 
 ## Thanks for the attention! See you in another tutorial!
 Written by Özgür Yolcu
+
 Instructed by Gabriel Renaud

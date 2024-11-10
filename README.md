@@ -321,6 +321,9 @@ python3 hello_world.py 2> status.txt
 
 That's the end of this chapter. Next on, we will talk about a real-world implementation of all concepts above.
 
+# Real World Example
+
+Welcome! This part of the tutorial provides a real-world example where you can use what you have learned above. All of the code examples below can be found in this GitHub repository. So let's get started!
 
 # Random Integer Generator
 

@@ -319,7 +319,7 @@ Based on this information, we can redirect our status message into `status.txt` 
 python3 hello_world.py 2> status.txt 
 ```
 
-That's the end of this chapter. Next on, we will talk about a real-world implementation of all concepts above.
+That's the end of this chapter. Next on, we will talk about a real-world implementation of all the concepts above.
 
 # Real World Example
 
@@ -327,9 +327,49 @@ Welcome! This part of the tutorial provides a real-world example where you can u
 
 # Random Integer Generator
 
-This script is designed to generate random integers within a specified interval. It is intended for use as an internship task, providing a simple way to produce a list of random numbers.
-The script can be executed from the command line with optional arguments to specify the number of integers to generate and the range of values.
-It returns none since the generated numbers are written directly to the `stdout`.
+Let's see the script first:
+
+```python
+import sys
+import random as r
+import argparse
+import time
+
+parser = argparse.ArgumentParser(description="This program generates random integers within a given interval.")
+parser.add_argument("num_of_nums", metavar="n", type=int, nargs="?", default=100, help="number of generated numbers (default: 100)")
+parser.add_argument("--min", metavar="min", type=int, default=10, help="minimum value of the interval (default: 10)")
+parser.add_argument("--max", metavar="max", type=int, default=100, help="maximum value of the interval (default: 100)")
+args = parser.parse_args()
+
+def random_int_generator(number_of_numbers = 100, min_interval = 10, max_interval = 100):
+    """Generates random integers within a specified interval and writes them to outputs.txt."""
+    with open("outputs.txt", "w") as file:  # Open the file for writing
+        for _ in range(number_of_numbers):
+            num = r.randint(min_interval, max_interval)
+            file.write(f"{num}\n")  # Write each number to the file, one per line
+
+def main():
+    """Main function to run the random integer generator and measure its runtime."""
+    # Record the start time
+    start_time = time.perf_counter()
+
+    # Run the random integer generator
+    random_int_generator(args.num_of_nums, args.min, args.max)
+
+    # Record the end time
+    end_time = time.perf_counter()
+
+    # Calculate the runtime
+    runtime = end_time - start_time
+
+    # Print the runtime to stderr to keep it separate from the generated numbers
+    print(f"The runtime of the random integer generator is {runtime:.6f} seconds", file=sys.stderr)
+
+if __name__ == "__main__":
+    main()
+```
+
+The script is designed to generate random integers within a specified interval. Also this script can be executed from the command line with optional arguments to specify the number of integers to generate and the range of values. It returns none since the generated numbers are written directly to a file named `outputs.txt`.
 
 Ensure that the `min` value is less than or equal to the `max` value to avoid errors.
 
@@ -346,7 +386,7 @@ python3 random_int_generator.py 50 --min 1 --max 50
 
 Since this code prints out all the numbers as we did in `random_name_generator`, we will process it as we did in `hello_world.py`. 
 
-This code also provides the `runtime`. By measuring the runtime, you can evaluate how quickly the program generates the desired number of random integers within the specified interval. This information is crucial for optimizing the code, especially when scaling up to generate larger datasets or integrating the generator into larger applications where performance may impact overall system efficiency. And while this process ongoing, you can check memory or CPU usage by using `htop`, as we talked about in the previous section.
+This code also provides the `runtime`, which printed out directly to the `stderr`. By measuring the runtime, you can evaluate how quickly the program generates the desired number of random integers within the specified interval. This information is crucial for optimizing the code, especially when scaling up to generate larger datasets or integrating the generator into larger applications where performance may impact overall system efficiency. And while this process ongoing, you can check memory or CPU usage by using `htop`, as we talked about in the previous section.
 
 # Prime Checkers (Naive and 4 Others)
 

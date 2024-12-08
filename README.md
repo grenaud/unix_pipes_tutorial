@@ -754,7 +754,7 @@ Note that the both memory and CPU usage went sharply up, and caused some absurd 
 
 But after that, the third one was caught during the prime checker:
 ![during prime checker](https://github.com/user-attachments/assets/8e00ebd4-89ec-4a13-a540-e359ec9cfec3)
-It seems like they not using all % of both CPU and Memory, the current usage says different things. As we can see, all of the memory and swap memory filled up. That's exactly when the process has been killed also. The program can not move to the RSA checking part, because everything has been killed in this part and stopped already. At this point, we should ask ourselves how to optimize or maybe bypass this step to get a more efficient pipeline.
+It seems like they not using all % of both CPU and Memory, the current usage says different things. As we can see, all of the memory and swap memory filled up. That's exactly when the process has been killed also. The program can not move to the RSA checking part, because everything has been killed in this part and stopped already. At this point, we should ask ourselves how to optimize or maybe bypass this step to get a more efficient pipeline. Also as we said earlier, we will provide another prime checking algorithms besides the naive one, you can check yourself and find out which one is the better :).
 
 # Thanks for the attention! See you in another tutorial!
 Written by Özgür Yolcu

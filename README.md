@@ -683,38 +683,40 @@ It made no observable difference between pipes and file descriptors, but surely 
 
 ## RSA Checker and Others
 
-We know by now, which methods are faster, so we will stick into it. Yet, lets try and see one more time the time difference using a more automated method and exhaustively transporting files here and there, between scripts.
+We know by now, which methods are faster, so we will stick to it. Yet, let's try and see one more time the time difference using a more automated method and exhaustively transporting files here and there, between scripts.
 Let's take firstly the long road.
+
+And the other thing is, that we will generate only 5.000.000 of integers here, we will talk about it in short.
 
 ### Using Intermediate Files
 
 We can achieve it with the following codes:
 
 ```bash
-time python3 random_int_generator.py 50000000 --min 100 --max 1000000 | python3 prime_checker_naive_approach.py > primes.txt
-time python3 random_int_generator.py 50000000 --min 100 --max 1000000 | python3 prime_checker_naive_approach.py > primes2.txt
+time python3 random_int_generator.py 5000000 --min 100 --max 1000000 | python3 prime_checker_naive_approach.py > primes.txt
+time python3 random_int_generator.py 5000000 --min 100 --max 1000000 | python3 prime_checker_naive_approach.py > primes2.txt
 time python3 RSAchecker.py primes.txt primes2.txt > valid_pairs.txt
 ```
 After running them all, the runtimes would look like:
 
 ```
-real    3m17.896s
-user    2m54.766s
-sys     0m17.640s
+real    0m12.585s
+user    0m10.159s
+sys     0m2.642s
 
 and
 
-real    3m5.132s
-user    2m47.122s
-sys     0m12.103s
+real    0m10.612s
+user    0m10.117s
+sys     0m0.670s
 
 and
 
-real    0m39.792s
-user    0m35.513s
-sys     0m4.263s
+real    0m3.912s
+user    0m3.486s
+sys     0m0.411s
 ```
-It took nearly 7 minutes to resolve all three codes, with 3 files taking nearly 700MB of space. Now let's try it with much faster method.
+It took nearly 27 seconds to resolve all three codes, with 3 files taking nearly 60MB of space. Now let's try it with the much faster method.
 
 ### Using Pipes and File Descriptors Together
 
@@ -724,21 +726,39 @@ We will modify the code we used in the previous section while introducing RSAche
 time python3 RSAcheckerNEW.py > valid_pairs.txt
 <(python random_int_generator.py 50000000 --min 100 --max 1000000 | python prime_checker_naive_approach.py)
 <(python random_int_generator.py 50000000 --min 100 --max 1000000 | python prime_checker_naive_approach.py)
+> valid_pairs.txt
 ```
 aaaaand here comes the runtime!!!:
 
 ```
-real    3m0.935s
-user    0m48.917s
-sys     0m15.273s
+real    0m15.262s
+user    0m3.468s
+sys     0m0.480s
 ```
-Really a huge improvement. In the means of time, using much automated architectures and omitting files make a huge difference.
+Really a huge improvement. In the means of time, using much more automated architectures and omitting files make a huge difference.
 
-## Benchmarking with `htop`
+But let's talk about why we did not use fifty million integers as we did earlier? Yeah, to be honest, 6GB RAM can not handle processing that much of integers. That leads us to the second important thing, the `computational load.` The main concern at this point is, which script causes that overload? Let's find out that together!
 
+## Computational Load Benchmarking with `htop`
 
+As we talked about it in the Linux Concepts section, `htop` helps us to find out the computational load. We need to open a `htop` screen.
+I will provide here a couple of `htop` screenshots, let's compare them.
+
+The first one is taken during the random integer generation.
+![during random int](https://github.com/user-attachments/assets/949ae9e7-6c94-42a9-94a5-1f9239a1aaf5)
+The maximum percentage usage of CPU and Memory is nearly 2.7% here, not much, not to be concerned about. We can see that the random integer generator works rather optimized. At least, it does not bring the computational load we are talking about here.
+
+The second screenshot have been taken right after the random integer generation.
+![after random int](https://github.com/user-attachments/assets/4b979224-93f0-484f-97f5-b68ac13e09c4)
+Note that the both memory and CPU usage went sharply up, and caused some absurd numbers, like 101% usage of CPU. Initialization may caused that, but the program works still. 
+
+But after that, the third one was caught during the prime checker:
+![during prime checker](https://github.com/user-attachments/assets/8e00ebd4-89ec-4a13-a540-e359ec9cfec3)
+It seems like they not using all % of both CPU and Memory, the current usage says different things. As we can see, all of the memory and swap memory filled up. That's exactly when the process has been killed also. The program can not move to the RSA checking part, because everything has been killed in this part and stopped already. At this point, we should ask ourselves how to optimize or maybe bypass this step to get a more efficient pipeline.
 
 # Thanks for the attention! See you in another tutorial!
 Written by Özgür Yolcu
 
 Instructed by Gabriel Renaud
+
+

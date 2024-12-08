@@ -97,6 +97,16 @@ By writing that, you should get a tab like the following:
 
 The best thing (for me) `htop` providing is the `with mouse navigating`. You can click the buttons on green line and access CPU-Usage, Memory-Usage and so on.
 
+## time
+
+`time` is a tiny command that helps measure the execution time of a command or script. It gives out three different measurements, which are:
+
+```
+real: Total elapsed time starting with input and end of the task.
+user: CPU time spent in user mode. This is the runtime of your code.
+sys: CPU time spent in kernel mode. This is the writing to file, reading from file, and such things (file descriptors or pipes).
+```
+
 # stdout, stdin and stderr
 
 ## stdout (Standard Output)
@@ -355,6 +365,12 @@ parser.add_argument(
             type=int,
             default=100,
             help="maximum value of the interval (default: 100)")
+parser.add_argument(
+            "--output", "-o",
+            metavar="FILE",
+            type=str,
+            default="random_numbers.txt",
+            help="output file to write the numbers (default: random_numbers.txt)")
 args = parser.parse_args()
 
 def random_int_generator(number_of_numbers = 100, min_interval = 10, max_interval = 100):
@@ -390,6 +406,7 @@ Arguments (or flags) are:
 - `n` (positional, optional): The number of random integers to generate. Defaults to 100 if not specified.
 - `--min` (optional): The minimum value of the interval. Defaults to 10.
 - `--max` (optional): The maximum value of the interval. Defaults to 100.
+- `--output` (optional): The output file of random numbers. Defaults to 'random_numbers.txt'
 Ensure that the `min` value is less than or equal to the `max` value to avoid errors.
 ```
 
@@ -431,7 +448,6 @@ import argparse
 import time
 import sys
 
-# Set up argument parsing
 parser = argparse.ArgumentParser(description="Prime Number Checker. This program checks if the input numbers are prime and writes the primes to an output file.")
 parser.add_argument(
     'input_file',
@@ -439,12 +455,6 @@ parser.add_argument(
     type=str,
     default='-',
     help='Path to the input file containing numbers to check. Use "-" or omit to read from stdin.'
-    )
-parser.add_argument(
-    '-o', '--output_file',
-    type=str,
-    default='primes.txt',
-    help='Path to the output file where prime numbers will be written. Defaults to "primes.txt".'
     )
 args = parser.parse_args()
 
@@ -485,11 +495,6 @@ def main():
     end_time = time.time()
     runtime = end_time - start_time
 
-    # Write primes in a file
-    with open(args.output_file, 'w') as file:
-        for prime in primes:
-            file.write(f"{prime}\n")
-
     # Write primes to the stdout
     if primes:
         print("\n".join(map(str, primes)), file=sys.stdout)
@@ -504,7 +509,6 @@ where,
 ```
 Arguments (or flags) are:
 - `input file` (positional, optional): The file consisting random integers. If not given, it will try to read from stdin.
-- `output_file` (optional): Where to output primes (in a file), defaults to primes.txt. 
 ```
 
 This prime checker script is designed to determine if numbers provided via standard input (`stdin`) or through a file, are prime. 
@@ -610,7 +614,131 @@ And voila! It worked perfectly, and we have valid prime number pairs for encrypt
 
 Congrats! Your encryption works!
 
-## Thanks for the attention! See you in another tutorial!
+# Benchmarking
+
+Love to see all codes in action, but checking if they are working optimized is another concern since we need everything (ideally) low-cost at the means of time, calculations, and such. So we need to benchmark our pipeline to see if some code bottlenecks or raises errors during the pipeline. For this benchmarking, we are going to use the `time` function of Linux (see Linux Concepts Section, if you already forgot :D.) Let's start building our pipeline!
+
+# Time Efficiency Benchmarking
+
+## Random Integer Generator and Prime Checker
+
+Based on our knowledge from the previous section, we know that we can achieve this pipeline with various methods, like using intermediate files, file descriptors, or pipes. So when we need to pick any of them, the concern is cost efficiency, and in this case, it is time efficiency. Let's try every method and check if it really changes that much. We are going to generate 50.000.000 numbers in every test, which are between 100 and 1.000.000. All tests are undergone with 6GB RAM and 2GB Swap Memory.
+
+### Using Intermediate Files
+
+We will, for testing intermediate files, generate a file consists all random integers and feed `prime checker` with them. In order to achieve that, we will check them separately and add up later. We will use the code:
+
+```bash
+time python3 random_int_generator.py 50000000 --min 100 --max 1000000 > random_integers.txt
+time python3 prime_checker.py random_integers.txt > prime_list_first.txt
+```
+
+The runtime of both are, respectively:
+
+```
+real    0m44.270s
+user    0m42.046s
+sys     0m2.200s
+
+and
+
+real    2m39.985s
+user    2m6.337s
+sys     0m25.831s
+```
+
+Which makes total of nearly 3 minutes and 30 seconds, `without coding time.` Please note that the prime checker works way much slower than the random integer generator.
+
+### Using Pipes
+
+Let's pipe them together! We will use the code below:
+
+```bash
+time python3 random_int_generator.py 50000000 --min 100 --max 1000000 | python3 prime_checker.py
+```
+
+The total runtime of this code is:
+```
+real    2m41.284s
+user    2m21.816s
+sys     0m15.455s
+```
+It made a difference, yes? A minute down seems not that big but imagine much bigger tasks. We always prefer lower time consumptions with also `lower coding times.`
+
+### Using File Descriptors
+
+The file descriptors method is the last method to benchmark between the random integer generator and prime checker. After this, we will be going to connect all three scripts and find the best-est method of all time! Connecting with file descriptors these two scripts would be achieved like this:
+
+```bash
+time python3 prime_checker_naive_approach.py > primes.txt <(python3 random_int_generator.py 50000000 --min 100 --max 1000000)
+```
+and the runtime:
+
+```
+real    2m50.221s
+user    2m31.008s
+sys     0m12.328s
+```
+It made no observable difference between pipes and file descriptors, but surely they are much faster than using intermediate files. So we are going to use one of the faster ones in RSA benchmarking.
+
+## RSA Checker and Others
+
+We know by now, which methods are faster, so we will stick into it. Yet, lets try and see one more time the time difference using a more automated method and exhaustively transporting files here and there, between scripts.
+Let's take firstly the long road.
+
+### Using Intermediate Files
+
+We can achieve it with the following codes:
+
+```bash
+time python3 random_int_generator.py 50000000 --min 100 --max 1000000 | python3 prime_checker_naive_approach.py > primes.txt
+time python3 random_int_generator.py 50000000 --min 100 --max 1000000 | python3 prime_checker_naive_approach.py > primes2.txt
+time python3 RSAchecker.py primes.txt primes2.txt > valid_pairs.txt
+```
+After running them all, the runtimes would look like:
+
+```
+real    3m17.896s
+user    2m54.766s
+sys     0m17.640s
+
+and
+
+real    3m5.132s
+user    2m47.122s
+sys     0m12.103s
+
+and
+
+real    0m39.792s
+user    0m35.513s
+sys     0m4.263s
+```
+It took nearly 7 minutes to resolve all three codes, with 3 files taking nearly 700MB of space. Now let's try it with much faster method.
+
+### Using Pipes and File Descriptors Together
+
+We will modify the code we used in the previous section while introducing RSAchecker. The code will look like this:
+
+```bash
+time python3 RSAcheckerNEW.py > valid_pairs.txt
+<(python random_int_generator.py 50000000 --min 100 --max 1000000 | python prime_checker_naive_approach.py)
+<(python random_int_generator.py 50000000 --min 100 --max 1000000 | python prime_checker_naive_approach.py)
+```
+aaaaand here comes the runtime!!!:
+
+```
+real    3m0.935s
+user    0m48.917s
+sys     0m15.273s
+```
+Really a huge improvement. In the means of time, using much automated architectures and omitting files make a huge difference.
+
+## Benchmarking with `htop`
+
+
+
+# Thanks for the attention! See you in another tutorial!
 Written by Özgür Yolcu
 
 Instructed by Gabriel Renaud
